@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  DIRECTOR
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  age      Int
+  password String?
+  role     Role
+
+  inviteToken String?  @unique
+  createdAt   DateTime @default(now())
+
+  student  Student?
+  teacher  Teacher?
+  director Director?
+}
+
+model Student {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  registration String @unique
+
+  classroomId Int
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  progress Progress[]
+}
+
+model Teacher {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  classDisciplines ClassDiscipline[]
+}
+
+model Director {
+  id Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Classroom {
+  id       Int    @id @default(autoincrement())
+  name     String
+  semester Int
+  year     Int
+
+  students Student[]
+
+  classDisciplines ClassDiscipline[]
+
+  courseId Int?
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+}
+
+model Course {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  classrooms Classroom[]
+}
+
+model Discipline {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  classDisciplines ClassDiscipline[]
+
+  courseModules CourseModule[]
+}
+
+model ClassDiscipline {
+  id Int @id @default(autoincrement())
+
+  classroomId Int
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  disciplineId Int
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  progress Progress[]
+
+  @@unique([classroomId, disciplineId])
+}
+
+model CourseModule {
+  id    Int    @id @default(autoincrement())
+  title String
+
+  disciplineId Int
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id       Int     @id @default(autoincrement())
+  title    String
+  videoUrl String?
+
+  moduleId Int
+  module   CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  progress Progress[]
+}
+
+model Progress {
+  id Int @id @default(autoincrement())
+
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  lessonId Int
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  classDisciplineId Int
+  classDiscipline   ClassDiscipline @relation(fields: [classDisciplineId], references: [id], onDelete: Cascade)
+
+  completed   Boolean   @default(false)
+  watchedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([studentId, lessonId])
+}
