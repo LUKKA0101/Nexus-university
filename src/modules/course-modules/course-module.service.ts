@@ -1,43 +1,96 @@
-// module.service.ts
-import prisma from "../../prisma/prisma";
-import { PrismaClientKnownRequestError } from "../../generated/client/runtime/client";
-import { ModuleDTO, ModuleUpdateDTO } from "./course-module.validate";
+import prisma from "../../lib/prisma";
+import {
+  CreateCourseModuleDTO,
+  UpdateCourseModuleDTO,
+} from "./course-module.validate";
+
+const courseModuleSelect = {
+  id: true,
+  title: true,
+  discipline: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+} as const;
 
 export class CourseModuleService {
-  async createModule(data: ModuleDTO) {
-    return await prisma.courseModule.create({ data });
+  // Method to create a course module
+  async createCourseModule(data: CreateCourseModuleDTO) {
+    return await prisma.courseModule.create({
+      data,
+      select: courseModuleSelect,
+    });
   }
 
-  async updateModule(id: number, data: ModuleUpdateDTO) {
-    try {
-      return await prisma.courseModule.update({ where: { id }, data });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Módulo não encontrado");
-      }
-      throw e;
-    }
+  // Method to list all course modules
+  async listAllCourseModules() {
+    return await prisma.courseModule.findMany({
+      select: courseModuleSelect,
+    });
   }
 
-  async deleteModule(id: number) {
-    try {
-      return await prisma.courseModule.delete({ where: { id } });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Módulo não encontrado");
-      }
-      throw e;
-    }
-  }
-
-  async getModuleById(id: number) {
+  // Method to get a course module by ID
+  async getCourseModuleById(id: number) {
     const result = await prisma.courseModule.findUnique({
       where: { id },
-      include: {
-        lessons: true,
+      select: courseModuleSelect,
+    });
+
+    if (!result) throw new Error("COURSE_MODULE_NOT_FOUND");
+
+    return result;
+  }
+
+  // Method to get lessons of a course module
+  async getCourseModuleLessons(id: number) {
+    const result = await prisma.courseModule.findUnique({
+      where: { id },
+      select: {
+        title: true,
+        discipline: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        lessons: {
+          select: {
+            id: true,
+            title: true,
+            videoUrl: true,
+          },
+        },
       },
     });
-    if (!result) throw new Error("Módulo não encontrado");
-    return result;
+
+    if (!result) throw new Error("COURSE_MODULE_NOT_FOUND");
+
+    return {
+      module: result.title,
+      discipline: result.discipline,
+      lessons: result.lessons,
+    };
+  }
+
+  // Method to update a course module by ID
+  async updateCourseModuleById(id: number, data: UpdateCourseModuleDTO) {
+    const exists = await prisma.courseModule.findUnique({ where: { id } });
+    if (!exists) throw new Error("COURSE_MODULE_NOT_FOUND");
+
+    return await prisma.courseModule.update({
+      where: { id },
+      data,
+      select: courseModuleSelect,
+    });
+  }
+
+  // Method to delete a course module by ID
+  async deleteCourseModuleById(id: number) {
+    const exists = await prisma.courseModule.findUnique({ where: { id } });
+    if (!exists) throw new Error("COURSE_MODULE_NOT_FOUND");
+
+    await prisma.courseModule.delete({ where: { id } });
   }
 }

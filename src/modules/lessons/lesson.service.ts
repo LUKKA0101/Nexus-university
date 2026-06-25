@@ -1,42 +1,62 @@
-import prisma from "../../prisma/prisma";
-import { PrismaClientKnownRequestError } from "../../generated/client/runtime/client";
-import { LessonDTO, LessonUpdateDTO } from "./lesson.validate";
+import prisma from "../../lib/prisma";
+import { CreateLessonDTO, UpdateLessonDTO } from "./lesson.validate";
+
+const lessonSelect = {
+  id: true,
+  title: true,
+  videoUrl: true,
+  module: {
+    select: {
+      id: true,
+      title: true,
+      discipline: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+} as const;
 
 export class LessonService {
-  async createLesson(data: LessonDTO) {
-    return await prisma.lesson.create({ data });
+  // Method to create a lesson
+  async createLesson(data: CreateLessonDTO) {
+    return await prisma.lesson.create({
+      data,
+      select: lessonSelect,
+    });
   }
 
-  async updateLesson(id: number, data: LessonUpdateDTO) {
-    try {
-      return await prisma.lesson.update({ where: { id }, data });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Aula não encontrada");
-      }
-      throw e;
-    }
-  }
-
-  async deleteLesson(id: number) {
-    try {
-      return await prisma.lesson.delete({ where: { id } });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Aula não encontrada");
-      }
-      throw e;
-    }
-  }
-
+  // Method to get a lesson by ID
   async getLessonById(id: number) {
     const result = await prisma.lesson.findUnique({
       where: { id },
-      include: {
-        module: true,
-      },
+      select: lessonSelect,
     });
-    if (!result) throw new Error("Aula não encontrada");
+
+    if (!result) throw new Error("LESSON_NOT_FOUND");
+
     return result;
+  }
+
+  // Method to update a lesson by ID
+  async updateLessonById(id: number, data: UpdateLessonDTO) {
+    const exists = await prisma.lesson.findUnique({ where: { id } });
+    if (!exists) throw new Error("LESSON_NOT_FOUND");
+
+    return await prisma.lesson.update({
+      where: { id },
+      data,
+      select: lessonSelect,
+    });
+  }
+
+  // Method to delete a lesson by ID
+  async deleteLessonById(id: number) {
+    const exists = await prisma.lesson.findUnique({ where: { id } });
+    if (!exists) throw new Error("LESSON_NOT_FOUND");
+
+    await prisma.lesson.delete({ where: { id } });
   }
 }

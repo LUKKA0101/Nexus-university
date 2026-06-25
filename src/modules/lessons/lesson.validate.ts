@@ -1,12 +1,14 @@
 import z from "zod";
 
-export const lessonSchema = z.object({
-  title: z.string().trim().min(3),
-  videoUrl: z.string().url().optional(),
-  moduleId: z.int().positive(),
-});
+export const createLessonSchema = z
+  .object({
+    title: z.string().trim().min(1),
+    videoUrl: z.url().optional(),
+    moduleId: z.int().positive(),
+  })
+  .strict();
 
-export const lessonUpdateSchema = lessonSchema.partial();
+export const updateLessonSchema = createLessonSchema.partial().strict();
 
-export type LessonDTO = z.infer<typeof lessonSchema>;
-export type LessonUpdateDTO = z.infer<typeof lessonUpdateSchema>;
+export type CreateLessonDTO = z.infer<typeof createLessonSchema>;
+export type UpdateLessonDTO = z.infer<typeof updateLessonSchema>;

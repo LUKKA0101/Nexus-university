@@ -1,42 +1,102 @@
-import prisma from "../../prisma/prisma";
-import { PrismaClientKnownRequestError } from "../../generated/client/runtime/client";
-import { DisciplineDTO, DisciplineUpdateDTO } from "./discipline.validate";
+import prisma from "../../lib/prisma";
+import {
+  CreateDisciplineDTO,
+  UpdateDisciplineDTO,
+} from "./discipline.validate";
+
+const disciplineSelect = {
+  id: true,
+  name: true,
+  courseModules: {
+    select: {
+      id: true,
+      title: true,
+      lessons: {
+        select: {
+          id: true,
+          title: true,
+          videoUrl: true,
+        },
+      },
+    },
+  },
+} as const;
 
 export class DisciplineService {
-  async createDiscipline(data: DisciplineDTO) {
-    return await prisma.discipline.create({ data });
+  // Method to create a discipline
+  async createDiscipline(data: CreateDisciplineDTO) {
+    return await prisma.discipline.create({
+      data,
+      select: disciplineSelect,
+    });
   }
 
-  async updateDiscipline(id: number, data: DisciplineUpdateDTO) {
-    try {
-      return await prisma.discipline.update({ where: { id }, data });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Disciplina não encontrada");
-      }
-      throw e;
-    }
+  // Method to list all disciplines
+  async listAllDisciplines() {
+    return await prisma.discipline.findMany({
+      select: disciplineSelect,
+    });
   }
 
-  async deleteDiscipline(id: number) {
-    try {
-      return await prisma.discipline.delete({ where: { id } });
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === "P2025") {
-        throw new Error("Disciplina não encontrada");
-      }
-      throw e;
-    }
-  }
-
+  // Method to get a discipline by ID
   async getDisciplineById(id: number) {
     const result = await prisma.discipline.findUnique({
       where: { id },
-      include: {
-        courseModules: true,
+      select: disciplineSelect,
+    });
+
+    if (!result) throw new Error("DISCIPLINE_NOT_FOUND");
+
+    return result;
+  }
+
+  // Method to get modules of a discipline
+  async getDisciplineModules(id: number) {
+    const result = await prisma.discipline.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        courseModules: {
+          select: {
+            id: true,
+            title: true,
+            lessons: {
+              select: {
+                id: true,
+                title: true,
+                videoUrl: true,
+              },
+            },
+          },
+        },
       },
     });
-    if (!result) throw new Error("Disciplina não encontrada");
-    return result;
+
+    if (!result) throw new Error("DISCIPLINE_NOT_FOUND");
+
+    return {
+      discipline: result.name,
+      modules: result.courseModules,
+    };
+  }
+
+  // Method to update a discipline by ID
+  async updateDisciplineById(id: number, data: UpdateDisciplineDTO) {
+    const exists = await prisma.discipline.findUnique({ where: { id } });
+    if (!exists) throw new Error("DISCIPLINE_NOT_FOUND");
+
+    return await prisma.discipline.update({
+      where: { id },
+      data,
+      select: disciplineSelect,
+    });
+  }
+
+  // Method to delete a discipline by ID
+  async deleteDisciplineById(id: number) {
+    const exists = await prisma.discipline.findUnique({ where: { id } });
+    if (!exists) throw new Error("DISCIPLINE_NOT_FOUND");
+
+    await prisma.discipline.delete({ where: { id } });
   }
 }

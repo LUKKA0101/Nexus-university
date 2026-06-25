@@ -5,8 +5,6 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Senha obrigatória").trim(),
 });
 
-const role = z.enum(["STUDENT", "TEACHER", "DIRECTOR"]);
-
 export const passwordSchema = z
   .object({
     password: z

@@ -1,10 +1,16 @@
-import z from "zod";
+import { z } from "zod";
 
-export const courseSchema = z.object({
-  name: z.string().trim().min(3),
-});
+export const createCourseSchema = z
+  .object({
+    name: z.string().min(1),
+  })
+  .strict();
 
-export const courseSchemaUpdate = courseSchema.partial();
+export const updateCourseSchema = z
+  .object({
+    name: z.string().min(1),
+  })
+  .strict();
 
-export type courseDTO = z.infer<typeof courseSchema>;
-export type courseUpdateDTO = z.infer<typeof courseSchemaUpdate>;
+export type CreateCourseDTO = z.infer<typeof createCourseSchema>;
+export type UpdateCourseDTO = z.infer<typeof updateCourseSchema>;

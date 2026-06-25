@@ -4,11 +4,7 @@ const role = z.enum(["STUDENT", "TEACHER", "DIRECTOR"]);
 
 export const registerSchema = z.object({
   name: z.string().trim().min(3, "Nome deve ter no mínimo 3 caracteres"),
-  age: z
-    .number()
-    .int()
-    .min(1, "Idade deve ser maior que 0")
-    .max(120, "Idade parece irreal"),
+  birthDate: z.coerce.date(),
   email: z.email("Email é obrigatório").trim(),
   role,
 });
@@ -22,5 +18,8 @@ export const studentRegisterSchema = registerSchema.extend({
   classroomId: z.number().positive("ID da classe é obrigatório"),
 });
 
+export const updateUserSchema = registerSchema.omit({ birthDate: true }).partial();
+
 export type RegisterDTO = z.infer<typeof registerSchema>;
 export type StudentRegisterDTO = z.infer<typeof studentRegisterSchema>;
+export type UpdateUserDTO = z.infer<typeof updateUserSchema>;

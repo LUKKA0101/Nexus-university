@@ -1,38 +1,64 @@
 import { Request, Response, NextFunction } from "express";
 import { ProgressService } from "./progress.service";
-import { progressSchema } from "./progress.validate";
+import { createProgressSchema } from "./progress.validate";
 
 export class ProgressController {
   constructor(private progressService: ProgressService) {}
 
+  // Method to register a lesson watch
   createProgress = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = progressSchema.parse(req.body);
+      const data = createProgressSchema.parse(req.body);
       const result = await this.progressService.createProgress(data);
-      res.status(201).json({ message: "Progresso registrado", data: result });
+      res
+        .status(201)
+        .json({ message: "Progress registered successfully", data: result });
     } catch (error) {
       next(error);
     }
   };
 
-  deleteProgress = async (req: Request, res: Response, next: NextFunction) => {
+  // Method to mark a lesson as complete
+  completeProgress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const id = Number(req.params.id);
-      await this.progressService.deleteProgress(id);
-      res.status(200).json({ message: "Progresso deletado" });
+      const result = await this.progressService.completeProgress(id);
+      res
+        .status(200)
+        .json({ message: "Lesson marked as completed", data: result });
     } catch (error) {
       next(error);
     }
   };
 
-  getProgressByStudent = async (
+  // Method to get full progress of a student
+  getStudentProgress = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
       const studentId = Number(req.params.studentId);
-      const result = await this.progressService.getProgressByStudent(studentId);
+      const result = await this.progressService.getStudentProgress(studentId);
+      res.status(200).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Method to get progress of a class discipline
+  getClassDisciplineProgress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const id = Number(req.params.id);
+      const result = await this.progressService.getClassDisciplineProgress(id);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

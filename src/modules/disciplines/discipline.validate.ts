@@ -1,10 +1,12 @@
 import z from "zod";
 
-export const disciplineSchema = z.object({
-  name: z.string().trim().min(3),
-});
+export const createDisciplineSchema = z
+  .object({
+    name: z.string().trim().min(1),
+  })
+  .strict();
 
-export const disciplineSchemaUpdate = disciplineSchema.partial();
+export const updateDisciplineSchema = createDisciplineSchema.partial().strict();
 
-export type DisciplineDTO = z.infer<typeof disciplineSchema>;
-export type DisciplineUpdateDTO = z.infer<typeof disciplineSchemaUpdate>;
+export type CreateDisciplineDTO = z.infer<typeof createDisciplineSchema>;
+export type UpdateDisciplineDTO = z.infer<typeof updateDisciplineSchema>;

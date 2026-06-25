@@ -1,14 +1,24 @@
 import z from "zod";
 
-export const classDisciplineSchema = z.object({
-  classroomId: z.int().positive(),
-  disciplineId: z.int().positive(),
-  teacherId: z.int().positive(),
-});
+export const createClassDisciplineSchema = z
+  .object({
+    classroomId: z.int().positive(),
+    disciplineId: z.int().positive(),
+    teacherId: z.int().positive(),
+  })
+  .strict();
 
-export const classDisciplineSchemaUpdate = classDisciplineSchema.partial();
+export const updateClassDisciplineSchema = createClassDisciplineSchema
+  .omit({
+    classroomId: true,
+    teacherId: true,
+  })
+  .partial()
+  .strict();
 
-export type ClassDisciplineDTO = z.infer<typeof classDisciplineSchema>;
-export type ClassDisciplineUpdateDTO = z.infer<
-  typeof classDisciplineSchemaUpdate
+export type CreateClassDisciplineDTO = z.infer<
+  typeof createClassDisciplineSchema
+>;
+export type UpdateClassDisciplineDTO = z.infer<
+  typeof updateClassDisciplineSchema
 >;

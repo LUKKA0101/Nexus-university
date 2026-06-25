@@ -1,41 +1,59 @@
-import prisma from "../../prisma/prisma";
-import { courseDTO, courseUpdateDTO } from "./course.validate";
+import prisma from "../../lib/prisma";
+import { CreateCourseDTO, UpdateCourseDTO } from "./course.validate";
+
+const courseSelect = {
+  id: true,
+  name: true,
+  classrooms: {
+    select: {
+      id: true,
+      name: true,
+      semester: true,
+      year: true,
+    },
+  },
+} as const;
 
 export class CourseService {
-  async createCourse(data: courseDTO) {
-    const result = await prisma.course.create({ data });
-    return result;
-  }
-
-  async updateCourse(id: number, data: courseUpdateDTO) {
-    const result = await prisma.course.update({
-      where: { id },
+  async createCourse(data: CreateCourseDTO) {
+    return await prisma.course.create({
       data,
+      select: courseSelect,
     });
-
-    if (!result) {
-      throw new Error("Curso não encontrado");
-    }
-    return result;
   }
 
-  async deleteCourse(id: number) {
-    const result = await prisma.course.delete({
-      where: { id },
+  async getCourses() {
+    return await prisma.course.findMany({
+      select: courseSelect,
     });
-    if (!result) {
-      throw new Error("Curso não encontrado");
-    }
-    return result;
   }
 
   async getCourseById(id: number) {
     const result = await prisma.course.findUnique({
       where: { id },
+      select: courseSelect,
     });
-    if (!result) {
-      throw new Error("Curso não encontrado");
-    }
+
+    if (!result) throw new Error("COURSE_NOT_FOUND");
+
     return result;
+  }
+
+  async updateCourseById(id: number, data: UpdateCourseDTO) {
+    const exists = await prisma.course.findUnique({ where: { id } });
+    if (!exists) throw new Error("COURSE_NOT_FOUND");
+
+    return await prisma.course.update({
+      where: { id },
+      data,
+      select: courseSelect,
+    });
+  }
+
+  async deleteCourseById(id: number) {
+    const exists = await prisma.course.findUnique({ where: { id } });
+    if (!exists) throw new Error("COURSE_NOT_FOUND");
+
+    await prisma.course.delete({ where: { id } });
   }
 }

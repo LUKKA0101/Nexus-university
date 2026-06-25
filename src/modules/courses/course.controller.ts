@@ -1,45 +1,26 @@
-import { NextFunction, Request, Response } from "express";
-import { courseSchema, courseSchemaUpdate } from "./course.validate";
+import { Request, Response, NextFunction } from "express";
 import { CourseService } from "./course.service";
+import { createCourseSchema, updateCourseSchema } from "./course.validate";
 
 export class CourseController {
   constructor(private courseService: CourseService) {}
 
   createCourse = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = courseSchema.parse(req.body);
+      const data = createCourseSchema.parse(req.body);
       const result = await this.courseService.createCourse(data);
-
-      res.status(201).json({
-        message: "curso criado",
-        data: result,
-      });
+      res
+        .status(201)
+        .json({ message: "Course created successfully", data: result });
     } catch (error) {
       next(error);
     }
   };
 
-  updateCourse = async (req: Request, res: Response, next: NextFunction) => {
+  getCourses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = Number(req.params.id);
-      const data = courseSchemaUpdate.parse(req.body);
-      const result = await this.courseService.updateCourse(id, data);
-      res.status(200).json({
-        message: "Atualizado com sucesso",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  deleteCourse = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const id = Number(req.params.id);
-      const result = this.courseService.deleteCourse(id);
-      res.status(200).json({
-        message: "Curso deletado",
-      });
+      const result = await this.courseService.getCourses();
+      res.status(200).json({ data: result });
     } catch (error) {
       next(error);
     }
@@ -48,10 +29,39 @@ export class CourseController {
   getCourseById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const result = this.courseService.getCourseById(id);
-      res.status(200).json({
-        data: result,
-      });
+      const result = await this.courseService.getCourseById(id);
+      res.status(200).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateCourseById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const id = Number(req.params.id);
+      const data = updateCourseSchema.parse(req.body);
+      const result = await this.courseService.updateCourseById(id, data);
+      res
+        .status(200)
+        .json({ message: "Course updated successfully", data: result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCourseById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const id = Number(req.params.id);
+      await this.courseService.deleteCourseById(id);
+      res.status(200).json({ message: "Course deleted successfully" });
     } catch (error) {
       next(error);
     }

@@ -1,11 +1,15 @@
 import z from "zod";
 
-export const courseModuleSchema = z.object({
-  title: z.string().trim().min(3),
-  disciplineId: z.int().positive(),
-});
+export const createCourseModuleSchema = z
+  .object({
+    title: z.string().trim().min(1),
+    disciplineId: z.int().positive(),
+  })
+  .strict();
 
-export const courseModuleUpdateSchema = courseModuleSchema.partial();
+export const updateCourseModuleSchema = createCourseModuleSchema
+  .partial()
+  .strict();
 
-export type ModuleDTO = z.infer<typeof courseModuleSchema>;
-export type ModuleUpdateDTO = z.infer<typeof courseModuleUpdateSchema>;
+export type CreateCourseModuleDTO = z.infer<typeof createCourseModuleSchema>;
+export type UpdateCourseModuleDTO = z.infer<typeof updateCourseModuleSchema>;
