@@ -18,7 +18,9 @@ export const studentRegisterSchema = registerSchema.extend({
   classroomId: z.number().positive("ID da classe é obrigatório"),
 });
 
-export const updateUserSchema = registerSchema.omit({ birthDate: true }).partial();
+export const updateUserSchema = registerSchema
+  .omit({ birthDate: true })
+  .partial();
 
 export type RegisterDTO = z.infer<typeof registerSchema>;
 export type StudentRegisterDTO = z.infer<typeof studentRegisterSchema>;

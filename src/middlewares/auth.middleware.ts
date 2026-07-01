@@ -7,19 +7,14 @@ export async function authMiddleware(
   res: Response,
   next: NextFunction,
 ) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ error: "Token not provided" });
-  }
-
   try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader?.startsWith("Bearer ")) {
+      throw new Error("TOKEN_MISSING");
+    }
+
+    const token = authHeader.split(" ")[1];
     const decode = jwt.verify(token, process.env.SECRET_KEY!);
     const payload = payloadSchema.parse(decode);
     req.user = payload;

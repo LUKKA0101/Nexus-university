@@ -71,60 +71,37 @@ export class ProgressService {
   }
 
   // Method to get full progress of a student
-  async getStudentProgress(studentId: number) {
+  async getStudentProgress(studentId: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
     const student = await prisma.student.findUnique({
       where: { id: studentId },
       select: {
         id: true,
         registration: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
+        user: { select: { name: true, email: true } },
+        _count: { select: { progress: true } },
         progress: {
-          select: {
-            id: true,
-            completed: true,
-            watchedAt: true,
-            completedAt: true,
-            lesson: {
-              select: {
-                id: true,
-                title: true,
-                videoUrl: true,
-              },
-            },
-            classDiscipline: {
-              select: {
-                id: true,
-                discipline: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-                classroom: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
+          skip,
+          take: limit,
+          select: {},
         },
       },
     });
 
     if (!student) throw new Error("STUDENT_NOT_FOUND");
 
+    const { _count, ...rest } = student;
+
     return {
-      studentId: student.id,
-      registration: student.registration,
+      ...rest,
       ...student.user,
-      progress: student.progress,
+      meta: {
+        total: _count.progress,
+        page,
+        limit,
+        totalPages: Math.ceil(_count.progress / limit),
+      },
     };
   }
 

@@ -28,7 +28,9 @@ export class ClassroomController {
     next: NextFunction,
   ) => {
     try {
-      const result = await this.classroomService.listAllClassrooms();
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const result = await this.classroomService.listAllClassrooms(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -57,8 +59,14 @@ export class ClassroomController {
     next: NextFunction,
   ) => {
     try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
       const id = Number(req.params.id);
-      const result = await this.classroomService.getClassroomStudents(id);
+      const result = await this.classroomService.getClassroomStudents(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

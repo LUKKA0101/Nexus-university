@@ -6,7 +6,8 @@ import {
   UpdateUserDTO,
 } from "./user.validate";
 import { generateInviteToken } from "../../utils/jwt";
-import { transporter } from "../../infra/email";
+import { buildPaginatedResponse } from "../../utils/paginate";
+import { formatDatesInArray } from "../../utils/formato";
 
 const userSelect = {
   id: true,
@@ -28,7 +29,7 @@ export class UserService {
           email: dataUser.email,
           role: dataUser.role,
           password: null,
-          //Creates a specific profile according to the user's role.
+
           ...(dataUser.role === "STUDENT" && {
             student: {
               create: {
@@ -37,30 +38,30 @@ export class UserService {
               },
             },
           }),
-          //Teacher has no additional data beyond the link to the user.
           ...(dataUser.role === "TEACHER" && { teacher: { create: {} } }),
-          //The director has no additional data beyond the link to the user.
           ...(dataUser.role === "DIRECTOR" && { director: { create: {} } }),
         },
         select: userSelect,
       });
 
-      // Generate invite token for password registration
       const inviteToken = generateInviteToken(user.id);
 
-      // Save the token to the user record
       await tx.user.update({
         where: { id: user.id },
         data: { inviteToken },
       });
 
-      try {
+      /*try {
         await transporter(user.email, inviteToken);
       } catch {
         throw new Error("EMAIL_SEND_FAILED");
-      }
+      }*/
 
-      return { user };
+      return {
+        ...user,
+        birthDate: user.birthDate.toISOString().split("T")[0],
+        createdAt: user.createdAt.toISOString().split("T")[0],
+      };
     });
   }
 
@@ -76,16 +77,9 @@ export class UserService {
         select: userSelect,
       }),
     ]);
-    return {
-      data: data.map((user) => ({
-        ...user,
-        birthDate: user.birthDate.toISOString().split("T")[0],
-        createdAt: user.createdAt.toISOString().split("T")[0],
-      })),
-      meta: {
-        total,
-      },
-    };
+
+    const formattedData = formatDatesInArray(data);
+    return buildPaginatedResponse(formattedData, page, limit, total);
   }
 
   // Method to list only one user via ID

@@ -1,6 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import { Prisma } from "../generated/client";
 import { ZodError } from "zod";
+import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 function errorHandler(
   err: Error,
@@ -36,6 +37,13 @@ function errorHandler(
           message: "Erro no banco de dados",
         });
     }
+  }
+
+  if (err instanceof TokenExpiredError) {
+    return res.status(401).json({ message: "Token expirado" });
+  }
+  if (err instanceof JsonWebTokenError) {
+    return res.status(401).json({ message: "Token inválido" });
   }
 
   const erroMap: Record<string, { status: number; message: string }> = {

@@ -19,7 +19,9 @@ export class CourseController {
 
   getCourses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.courseService.getCourses();
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const result = await this.courseService.getCourses(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

@@ -1,5 +1,6 @@
 import prisma from "../../lib/prisma";
 import { CreateCourseDTO, UpdateCourseDTO } from "./course.validate";
+import { buildPaginatedResponse } from "../../utils/paginate";
 
 const courseSelect = {
   id: true,
@@ -22,10 +23,23 @@ export class CourseService {
     });
   }
 
-  async getCourses() {
-    return await prisma.course.findMany({
-      select: courseSelect,
-    });
+  async getCourses(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [total, data] = await prisma.$transaction([
+      prisma.course.count(),
+
+      prisma.course.findMany({
+        skip,
+        take: limit,
+        select: courseSelect,
+      }),
+    ]);
+    return {
+      data: data.map((course) => ({
+        ...course,
+      })),
+      buildPaginatedResponse,
+    };
   }
 
   async getCourseById(id: number) {
