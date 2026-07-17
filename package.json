@@ -1,7 +1,7 @@
 {
   "name": "nexus.university",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "./dist/src/server.js",
   "author": "Lucas Pinheiro",
   "license": "MIT",
   "dependencies": {
@@ -27,10 +27,11 @@
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
-  "scripts": {
-    "start": "node dist/server.js",
-    "start:dev": "nodemon --exec ts-node src/server.ts",
-    "build": "tsc",
-    "prisma:studio": "npx prisma studio"
-  }
+"scripts": {
+  "start": "node dist/server.js",
+  "start:dev": "npx prisma db seed && nodemon --exec ts-node src/server.ts",
+  "build": "tsc",
+  "prisma:generate": "npx prisma generate",
+  "prisma:studio": "npx prisma studio"
+}
 }

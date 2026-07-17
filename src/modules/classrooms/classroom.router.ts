@@ -24,7 +24,7 @@ classroomRouter.get(
 classroomRouter.get(
   "/:id",
   authMiddleware,
-  authMiddlewareRoles("DIRECTOR", "TEACHER"),
+  authMiddlewareRoles("DIRECTOR", "TEACHER", "STUDENT"),
   classroomController.getClassroomById,
 );
 classroomRouter.get(

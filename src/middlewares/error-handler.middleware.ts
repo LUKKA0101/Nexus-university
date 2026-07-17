@@ -1,6 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import { Prisma } from "../generated/client";
 import { ZodError } from "zod";
+import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 function errorHandler(
   err: Error,
@@ -38,6 +39,13 @@ function errorHandler(
     }
   }
 
+  if (err instanceof TokenExpiredError) {
+    return res.status(401).json({ message: "Token expirado" });
+  }
+  if (err instanceof JsonWebTokenError) {
+    return res.status(401).json({ message: "Token inválido" });
+  }
+
   const erroMap: Record<string, { status: number; message: string }> = {
     USER_NOT_FOUND: { status: 404, message: "Usuário não identificado" },
     TEACHER_NOT_FOUND: { status: 404, message: "Professor não identificado" },
@@ -60,6 +68,7 @@ function errorHandler(
     PROGRESS_NOT_FOUND: { status: 404, message: "Progresso não identificado" },
     PROGRESS_ALREADY_COMPLETED: { status: 409, message: "Aula já concluída" },
     INVALID_CREDENTIALS: { status: 401, message: "Credenciais inválidas" },
+    TOKEN_MISSING: { status: 401, message: "Token não fornecido" },
     PASSWORD_NOT_SET: {
       status: 400,
       message:

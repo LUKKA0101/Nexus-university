@@ -4,6 +4,7 @@ import {
   createClassroomSchema,
   updateClassroomSchema,
 } from "./classroom.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ClassroomController {
   constructor(private classroomService: ClassroomService) {}
@@ -28,7 +29,8 @@ export class ClassroomController {
     next: NextFunction,
   ) => {
     try {
-      const result = await this.classroomService.listAllClassrooms();
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.classroomService.listAllClassrooms(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -57,8 +59,13 @@ export class ClassroomController {
     next: NextFunction,
   ) => {
     try {
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const id = Number(req.params.id);
-      const result = await this.classroomService.getClassroomStudents(id);
+      const result = await this.classroomService.getClassroomStudents(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -72,8 +79,13 @@ export class ClassroomController {
     next: NextFunction,
   ) => {
     try {
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const id = Number(req.params.id);
-      const result = await this.classroomService.getClassroomDisciplines(id);
+      const result = await this.classroomService.getClassroomDisciplines(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

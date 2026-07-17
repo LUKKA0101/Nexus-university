@@ -4,6 +4,7 @@ import {
   createDisciplineSchema,
   updateDisciplineSchema,
 } from "./discipline.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class DisciplineController {
   constructor(private disciplineService: DisciplineService) {}
@@ -32,7 +33,11 @@ export class DisciplineController {
     next: NextFunction,
   ) => {
     try {
-      const result = await this.disciplineService.listAllDisciplines();
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.disciplineService.listAllDisciplines(
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -61,8 +66,13 @@ export class DisciplineController {
     next: NextFunction,
   ) => {
     try {
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const id = Number(req.params.id);
-      const result = await this.disciplineService.getDisciplineModules(id);
+      const result = await this.disciplineService.getDisciplineModules(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

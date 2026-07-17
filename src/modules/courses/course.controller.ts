@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "./course.service";
 import { createCourseSchema, updateCourseSchema } from "./course.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class CourseController {
   constructor(private courseService: CourseService) {}
@@ -19,7 +20,8 @@ export class CourseController {
 
   getCourses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.courseService.getCourses();
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.courseService.getCourses(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

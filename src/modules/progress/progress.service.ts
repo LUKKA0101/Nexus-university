@@ -47,6 +47,34 @@ const progressSelect = {
 export class ProgressService {
   // Method to register a lesson watch
   async createProgress(data: CreateProgressDTO) {
+    const { studentId, lessonId, classDisciplineId } = data;
+
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+      select: { classroomId: true },
+    });
+    if (!student) throw new Error("STUDENT_NOT_FOUND");
+
+    const classDiscipline = await prisma.classDiscipline.findUnique({
+      where: { id: classDisciplineId },
+      select: { classroomId: true, disciplineId: true },
+    });
+    if (!classDiscipline) throw new Error("CLASS_DISCIPLINE_NOT_FOUND");
+
+    if (classDiscipline.classroomId !== student.classroomId) {
+      throw new Error("FORBIDDEN");
+    }
+
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      select: { module: { select: { disciplineId: true } } },
+    });
+    if (!lesson) throw new Error("LESSON_NOT_FOUND");
+
+    if (lesson.module.disciplineId !== classDiscipline.disciplineId) {
+      throw new Error("FORBIDDEN");
+    }
+
     return await prisma.progress.create({
       data,
       select: progressSelect,
@@ -71,19 +99,19 @@ export class ProgressService {
   }
 
   // Method to get full progress of a student
-  async getStudentProgress(studentId: number) {
+  async getStudentProgress(studentId: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
     const student = await prisma.student.findUnique({
       where: { id: studentId },
       select: {
         id: true,
         registration: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
+        user: { select: { name: true, email: true } },
+        _count: { select: { progress: true } },
         progress: {
+          skip,
+          take: limit,
           select: {
             id: true,
             completed: true,
@@ -93,24 +121,13 @@ export class ProgressService {
               select: {
                 id: true,
                 title: true,
-                videoUrl: true,
               },
             },
             classDiscipline: {
               select: {
                 id: true,
-                discipline: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-                classroom: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
+                discipline: { select: { id: true, name: true } },
+                classroom: { select: { id: true, name: true } },
               },
             },
           },
@@ -120,16 +137,28 @@ export class ProgressService {
 
     if (!student) throw new Error("STUDENT_NOT_FOUND");
 
+    const { _count, ...rest } = student;
+
     return {
-      studentId: student.id,
-      registration: student.registration,
+      ...rest,
       ...student.user,
-      progress: student.progress,
+      meta: {
+        total: _count.progress,
+        page,
+        limit,
+        totalPages: Math.ceil(_count.progress / limit),
+      },
     };
   }
 
   // Method to get progress of a class discipline
-  async getClassDisciplineProgress(classDisciplineId: number) {
+  async getClassDisciplineProgress(
+    classDisciplineId: number,
+    page: number,
+    limit: number,
+  ) {
+    const skip = (page - 1) * limit;
+
     const classDiscipline = await prisma.classDiscipline.findUnique({
       where: { id: classDisciplineId },
       select: {
@@ -147,6 +176,8 @@ export class ProgressService {
           },
         },
         progress: {
+          skip,
+          take: limit,
           select: {
             id: true,
             completed: true,
@@ -171,6 +202,9 @@ export class ProgressService {
             },
           },
         },
+        _count: {
+          select: { progress: true },
+        },
       },
     });
 
@@ -192,6 +226,12 @@ export class ProgressService {
           name: p.student.user.name,
         },
       })),
+      meta: {
+        total: classDiscipline._count.progress,
+        page,
+        limit,
+        totalPages: Math.ceil(classDiscipline._count.progress / limit),
+      },
     };
   }
 }

@@ -24,10 +24,27 @@ export class ClassroomService {
   }
 
   // Method to list all classrooms
-  async listAllClassrooms() {
-    return await prisma.classroom.findMany({
-      select: classroomSelect,
-    });
+  async listAllClassrooms(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [total, data] = await prisma.$transaction([
+      prisma.classroom.count(),
+      prisma.classroom.findMany({
+        skip,
+        take: limit,
+        select: classroomSelect,
+      }),
+    ]);
+    return {
+      data: data.map((classroom) => ({
+        ...classroom,
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   // Method to get a classroom by ID
@@ -43,8 +60,10 @@ export class ClassroomService {
   }
 
   // Method to list students of a classroom
-  async getClassroomStudents(id: number) {
-    const result = await prisma.classroom.findUnique({
+  async getClassroomStudents(id: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const classroom = await prisma.classroom.findUnique({
       where: { id },
       select: {
         name: true,
@@ -55,6 +74,8 @@ export class ClassroomService {
           },
         },
         students: {
+          skip,
+          take: limit,
           select: {
             id: true,
             registration: true,
@@ -69,31 +90,38 @@ export class ClassroomService {
             },
           },
         },
+        _count: {
+          select: { students: true },
+        },
       },
     });
 
-    if (!result) throw new Error("CLASSROOM_NOT_FOUND");
+    if (!classroom) throw new Error("CLASSROOM_NOT_FOUND");
+
+    const { _count, ...rest } = classroom;
 
     return {
-      classroom: result.name,
-      courseId: result.course?.id,
-      course: result.course?.name,
-      students: result.students.map((student) => ({
-        studentId: student.id,
-        registration: student.registration,
-        ...student.user,
-        birthDate: student.user.birthDate.toISOString().split("T")[0],
-      })),
+      ...rest,
+      meta: {
+        total: _count.students,
+        page,
+        limit,
+        totalPages: Math.ceil(_count.students / limit),
+      },
     };
   }
 
   // Method to list disciplines of a classroom
-  async getClassroomDisciplines(id: number) {
+  async getClassroomDisciplines(id: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
     const result = await prisma.classroom.findUnique({
       where: { id },
       select: {
         name: true,
         classDisciplines: {
+          skip,
+          take: limit,
           select: {
             id: true,
             discipline: {
@@ -114,6 +142,9 @@ export class ClassroomService {
             },
           },
         },
+        _count: {
+          select: { classDisciplines: true },
+        },
       },
     });
 
@@ -129,6 +160,12 @@ export class ClassroomService {
           name: cd.teacher.user.name,
         },
       })),
+      meta: {
+        total: result._count.classDisciplines,
+        page,
+        limit,
+        totalPages: Math.ceil(result._count.classDisciplines / limit),
+      },
     };
   }
 

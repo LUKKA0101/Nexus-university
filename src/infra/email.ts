@@ -23,7 +23,8 @@ export async function transporter(to: string, token: string) {
       <p style="color: #fff; font-size: 18px; font-weight: 500; margin: 0;">Escola</p>
     </div>
     <div style="padding: 2rem;">
-      <p style="font-size: 22px; font-weight: 500; margin: 0 0 0aolor: #fff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px;">
+      <p style="font-size: 16px; color: #333; margin: 0 0 1.5rem;">Você foi convidado a acessar a plataforma. Clique no botão abaixo para definir sua senha.</p>
+      <a href="${process.env.APP_URL}/register-password/${token}" style="display: inline-block; background: #1a1a2e; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px;">
         Ativar minha conta
       </a>
       <p style="font-size: 13px; color: #999; margin: 1.5rem 0 0; line-height: 1.7;">

@@ -4,6 +4,7 @@ import {
   createClassDisciplineSchema,
   updateClassDisciplineSchema,
 } from "./class-discipline.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ClassDisciplineController {
   constructor(private classDisciplineService: ClassDisciplineService) {}
@@ -34,8 +35,11 @@ export class ClassDisciplineController {
     next: NextFunction,
   ) => {
     try {
-      const result =
-        await this.classDisciplineService.listAllClassDisciplines();
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.classDisciplineService.listAllClassDisciplines(
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

@@ -1,5 +1,6 @@
 import prisma from "../../lib/prisma";
 import { UpdateTeacherDTO } from "./teacher.validate";
+import { buildPaginatedResponse } from "../../utils/paginate";
 
 const teacherSelect = {
   id: true,
@@ -48,22 +49,16 @@ export class TeacherService {
       }),
     ]);
 
-    return {
-      data: data.map((teacher) => ({
-        ...teacher,
-        user: {
-          ...teacher.user,
-          birthDate: teacher.user.birthDate.toISOString().split("T")[0],
-          createdAt: teacher.user.createdAt.toISOString().split("T")[0],
-        },
-      })),
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(page / limit),
+    const formattedData = data.map((teacher) => ({
+      ...teacher,
+      user: {
+        ...teacher.user,
+        birthDate: teacher.user.birthDate.toISOString().split("T")[0],
+        createdAt: teacher.user.createdAt.toISOString().split("T")[0],
       },
-    };
+    }));
+
+    return buildPaginatedResponse(formattedData, page, limit, total);
   }
 
   // Method to get a teacher by ID
@@ -84,12 +79,16 @@ export class TeacherService {
   }
 
   // Method to get a teacher disciplines by ID
-  async getTeacherDisciplines(id: number) {
+  async getTeacherDisciplines(id: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
     const result = await prisma.teacher.findUnique({
       where: { id },
       select: {
         user: { select: { name: true } },
         classDisciplines: {
+          skip,
+          take: limit,
           select: {
             id: true,
             classroom: {
@@ -108,14 +107,22 @@ export class TeacherService {
             },
           },
         },
+        _count: { select: { classDisciplines: true } },
       },
     });
 
     if (!result) throw new Error("TEACHER_NOT_FOUND");
 
+    const { user, classDisciplines, _count } = result;
+
     return {
-      user: result.user,
-      classDisciplines: result.classDisciplines,
+      teacherName: user.name,
+      ...buildPaginatedResponse(
+        classDisciplines,
+        page,
+        limit,
+        _count.classDisciplines,
+      ),
     };
   }
 
