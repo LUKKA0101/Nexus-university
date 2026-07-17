@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { StudentService } from "./student.service";
 import { updateStudentSchema } from "./student.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class StudentController {
   constructor(private studentService: StudentService) {}
@@ -8,8 +9,7 @@ export class StudentController {
   // Method to list all students
   listAllStudents = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const result = await this.studentService.listAllStudents(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {

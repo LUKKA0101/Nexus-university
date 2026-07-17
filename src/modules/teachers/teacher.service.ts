@@ -82,7 +82,7 @@ export class TeacherService {
   async getTeacherDisciplines(id: number, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
-    const classDisciplines = await prisma.teacher.findUnique({
+    const result = await prisma.teacher.findUnique({
       where: { id },
       select: {
         user: { select: { name: true } },
@@ -111,11 +111,19 @@ export class TeacherService {
       },
     });
 
-    if (!classDisciplines) throw new Error("TEACHER_NOT_FOUND");
+    if (!result) throw new Error("TEACHER_NOT_FOUND");
 
-    const { _count, ...rest } = classDisciplines;
+    const { user, classDisciplines, _count } = result;
 
-    return buildPaginatedResponse(rest, page, limit);
+    return {
+      teacherName: user.name,
+      ...buildPaginatedResponse(
+        classDisciplines,
+        page,
+        limit,
+        _count.classDisciplines,
+      ),
+    };
   }
 
   // Method to update a teacher by ID

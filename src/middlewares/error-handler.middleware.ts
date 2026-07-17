@@ -68,6 +68,7 @@ function errorHandler(
     PROGRESS_NOT_FOUND: { status: 404, message: "Progresso não identificado" },
     PROGRESS_ALREADY_COMPLETED: { status: 409, message: "Aula já concluída" },
     INVALID_CREDENTIALS: { status: 401, message: "Credenciais inválidas" },
+    TOKEN_MISSING: { status: 401, message: "Token não fornecido" },
     PASSWORD_NOT_SET: {
       status: 400,
       message:

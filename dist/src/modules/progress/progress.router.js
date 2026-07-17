@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const progress_service_1 = require("./progress.service");
+const progress_controller_1 = require("./progress.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_auth_middleware_1 = require("../../middlewares/role-auth.middleware");
+const checkOwnership_auth_middleware_1 = require("../../middlewares/checkOwnership-auth.middleware");
+const progressRouter = (0, express_1.Router)();
+const progressService = new progress_service_1.ProgressService();
+const progressController = new progress_controller_1.ProgressController(progressService);
+progressRouter.post("/", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("STUDENT"), (0, checkOwnership_auth_middleware_1.checkOwnershipStudentFromBody)(), progressController.createProgress);
+progressRouter.patch("/:id/complete", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("STUDENT"), (0, checkOwnership_auth_middleware_1.checkOwnershipProgress)(), progressController.completeProgress);
+progressRouter.get("/student/:studentId", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("STUDENT", "TEACHER", "DIRECTOR"), (0, checkOwnership_auth_middleware_1.checkOwnership)("student", "studentId"), progressController.getStudentProgress);
+progressRouter.get("/class-discipline/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER"), progressController.getClassDisciplineProgress);
+exports.default = progressRouter;

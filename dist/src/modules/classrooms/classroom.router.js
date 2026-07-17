@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const classroom_service_1 = require("./classroom.service");
+const classroom_controller_1 = require("./classroom.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_auth_middleware_1 = require("../../middlewares/role-auth.middleware");
+const classroomRouter = (0, express_1.Router)();
+const classroomService = new classroom_service_1.ClassroomService();
+const classroomController = new classroom_controller_1.ClassroomController(classroomService);
+classroomRouter.post("/", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), classroomController.createClassroom);
+classroomRouter.get("/", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER"), classroomController.listAllClassrooms);
+classroomRouter.get("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER", "STUDENT"), classroomController.getClassroomById);
+classroomRouter.get("/:id/students", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER"), classroomController.getClassroomStudents);
+classroomRouter.get("/:id/disciplines", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER", "STUDENT"), classroomController.getClassroomDisciplines);
+classroomRouter.put("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), classroomController.updateClassroomById);
+classroomRouter.delete("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), classroomController.deleteClassroomById);
+exports.default = classroomRouter;

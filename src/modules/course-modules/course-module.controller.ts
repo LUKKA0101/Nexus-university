@@ -4,6 +4,7 @@ import {
   createCourseModuleSchema,
   updateCourseModuleSchema,
 } from "./course-module.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class CourseModuleController {
   constructor(private courseModuleService: CourseModuleService) {}
@@ -32,7 +33,11 @@ export class CourseModuleController {
     next: NextFunction,
   ) => {
     try {
-      const result = await this.courseModuleService.listAllCourseModules();
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.courseModuleService.listAllCourseModules(
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -61,8 +66,13 @@ export class CourseModuleController {
     next: NextFunction,
   ) => {
     try {
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const id = Number(req.params.id);
-      const result = await this.courseModuleService.getCourseModuleLessons(id);
+      const result = await this.courseModuleService.getCourseModuleLessons(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

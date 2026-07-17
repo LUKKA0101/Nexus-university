@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { TeacherService } from "./teacher.service";
 import { updateTeacherSchema } from "./teacher.validate";
 import { AuthRequest } from "../../types/auth.types";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class TeacherController {
   constructor(private teacherService: TeacherService) {}
@@ -9,8 +10,7 @@ export class TeacherController {
   // Method to list all teachers
   listAllTeachers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.params.page as string) || 1;
-      const limit = parseInt(req.params.limit as string) || 10;
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const result = await this.teacherService.listAllTeachers(page, limit);
       res.status(200).json({ data: result });
     } catch (error) {
@@ -41,7 +41,12 @@ export class TeacherController {
   ) => {
     try {
       const id = Number(req.params.id);
-      const result = await this.teacherService.getTeacherDisciplines(id);
+      const { page, limit } = paginationQuerySchema.parse(req.query);
+      const result = await this.teacherService.getTeacherDisciplines(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);

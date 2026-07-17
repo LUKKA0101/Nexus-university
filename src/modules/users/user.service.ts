@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma";
-//import { transporter } from "../../infra/email";
+import { transporter } from "../../infra/email";
 import {
   RegisterDTO,
   StudentRegisterDTO,
@@ -7,7 +7,7 @@ import {
 } from "./user.validate";
 import { generateInviteToken } from "../../utils/jwt";
 import { buildPaginatedResponse } from "../../utils/paginate";
-import { formatDatesInArray } from "../../utils/formato";
+import { formatDatesInArray } from "../../utils/format";
 
 const userSelect = {
   id: true,
@@ -20,7 +20,7 @@ const userSelect = {
 export class UserService {
   // Method to register user
   async registerUser(dataUser: RegisterDTO, dataStudent?: StudentRegisterDTO) {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
       const birthDateAsDate = new Date(dataUser.birthDate);
       const user = await tx.user.create({
         data: {
@@ -51,11 +51,11 @@ export class UserService {
         data: { inviteToken },
       });
 
-      /*try {
+      try {
         await transporter(user.email, inviteToken);
       } catch {
         throw new Error("EMAIL_SEND_FAILED");
-      }*/
+      }
 
       return {
         ...user,

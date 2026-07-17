@@ -31,11 +31,13 @@ teacherRouter.get(
 );
 teacherRouter.put(
   "/:id",
+  authMiddleware,
   authMiddlewareRoles("DIRECTOR"),
   teacherController.updateTeacherById,
 );
 teacherRouter.delete(
   "/:id",
+  authMiddleware,
   authMiddlewareRoles("DIRECTOR"),
   teacherController.deleteTeacherById,
 );

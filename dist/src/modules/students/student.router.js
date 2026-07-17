@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const student_service_1 = require("./student.service");
+const student_controller_1 = require("./student.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_auth_middleware_1 = require("../../middlewares/role-auth.middleware");
+const checkOwnership_auth_middleware_1 = require("../../middlewares/checkOwnership-auth.middleware");
+const studentRouter = (0, express_1.Router)();
+const studentService = new student_service_1.StudentService();
+const studentController = new student_controller_1.StudentController(studentService);
+studentRouter.get("/", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER"), studentController.listAllStudents);
+studentRouter.get("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER", "STUDENT"), (0, checkOwnership_auth_middleware_1.checkOwnership)("student"), studentController.getStudentById);
+studentRouter.get("/:id/progress", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER", "STUDENT"), (0, checkOwnership_auth_middleware_1.checkOwnership)("student"), studentController.getStudentProgress);
+studentRouter.put("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), studentController.updateStudentById);
+studentRouter.delete("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), studentController.deleteStudentById);
+exports.default = studentRouter;

@@ -1,4 +1,3 @@
-import { meta } from "zod/v4/core";
 import prisma from "../../lib/prisma";
 import { UpdateStudentDTO } from "./student.validate";
 const studentSelect = {
@@ -45,7 +44,7 @@ export class StudentService {
         total,
         page,
         limit,
-        totalPages: Math.ceil(limit / page),
+        totalPages: Math.ceil(total / limit),
       },
     };
   }
@@ -101,6 +100,9 @@ export class StudentService {
 
   // Method to update a student by ID
   async updateStudentById(id: number, data: UpdateStudentDTO) {
+    const exists = await prisma.student.findUnique({ where: { id } });
+    if (!exists) throw new Error("STUDENT_NOT_FOUND");
+
     const result = await prisma.student.update({
       where: { id },
       data: {
@@ -121,6 +123,9 @@ export class StudentService {
 
   // Method to delete a student by ID
   async deleteStudentById(id: number) {
+    const exists = await prisma.student.findUnique({ where: { id } });
+    if (!exists) throw new Error("STUDENT_NOT_FOUND");
+
     await prisma.student.delete({ where: { id } });
   }
 }

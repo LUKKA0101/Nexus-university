@@ -38,7 +38,12 @@ export class CourseService {
       data: data.map((course) => ({
         ...course,
       })),
-      buildPaginatedResponse,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 

@@ -5,6 +5,7 @@ import {
   registerSchema,
 } from "./user.validate";
 import { NextFunction, Request, Response } from "express";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -34,8 +35,7 @@ export class UserController {
   // Method to list all users
   getAllUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.params.limit as string) || 10;
+      const { page, limit } = paginationQuerySchema.parse(req.query);
 
       const result = await this.userService.listAllUser(page, limit);
       res.status(200).json({

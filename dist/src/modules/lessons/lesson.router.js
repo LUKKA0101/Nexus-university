@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const lesson_service_1 = require("./lesson.service");
+const lesson_controller_1 = require("./lesson.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_auth_middleware_1 = require("../../middlewares/role-auth.middleware");
+const lessonRouter = (0, express_1.Router)();
+const lessonService = new lesson_service_1.LessonService();
+const lessonController = new lesson_controller_1.LessonController(lessonService);
+lessonRouter.post("/", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), lessonController.createLesson);
+lessonRouter.get("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR", "TEACHER", "STUDENT"), lessonController.getLessonById);
+lessonRouter.put("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), lessonController.updateLessonById);
+lessonRouter.delete("/:id", auth_middleware_1.authMiddleware, (0, role_auth_middleware_1.authMiddlewareRoles)("DIRECTOR"), lessonController.deleteLessonById);
+exports.default = lessonRouter;

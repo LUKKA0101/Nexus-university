@@ -3,6 +3,7 @@ import {
   CreateClassDisciplineDTO,
   UpdateClassDisciplineDTO,
 } from "./class-discipline.validate";
+import { buildPaginatedResponse } from "../../utils/paginate";
 
 const classDisciplineSelect = {
   id: true,
@@ -43,10 +44,19 @@ export class ClassDisciplineService {
   }
 
   // Method to list all class disciplines
-  async listAllClassDisciplines() {
-    return await prisma.classDiscipline.findMany({
-      select: classDisciplineSelect,
-    });
+  async listAllClassDisciplines(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [total, data] = await prisma.$transaction([
+      prisma.classDiscipline.count(),
+      prisma.classDiscipline.findMany({
+        skip,
+        take: limit,
+        select: classDisciplineSelect,
+      }),
+    ]);
+
+    return buildPaginatedResponse(data, page, limit, total);
   }
 
   // Method to get a class discipline by ID

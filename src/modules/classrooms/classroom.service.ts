@@ -40,6 +40,9 @@ export class ClassroomService {
       })),
       meta: {
         total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
     };
   }
@@ -109,12 +112,16 @@ export class ClassroomService {
   }
 
   // Method to list disciplines of a classroom
-  async getClassroomDisciplines(id: number) {
+  async getClassroomDisciplines(id: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
     const result = await prisma.classroom.findUnique({
       where: { id },
       select: {
         name: true,
         classDisciplines: {
+          skip,
+          take: limit,
           select: {
             id: true,
             discipline: {
@@ -135,6 +142,9 @@ export class ClassroomService {
             },
           },
         },
+        _count: {
+          select: { classDisciplines: true },
+        },
       },
     });
 
@@ -150,6 +160,12 @@ export class ClassroomService {
           name: cd.teacher.user.name,
         },
       })),
+      meta: {
+        total: result._count.classDisciplines,
+        page,
+        limit,
+        totalPages: Math.ceil(result._count.classDisciplines / limit),
+      },
     };
   }
 

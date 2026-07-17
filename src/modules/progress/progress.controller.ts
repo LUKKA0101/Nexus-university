@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ProgressService } from "./progress.service";
 import { createProgressSchema } from "./progress.validate";
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ProgressController {
   constructor(private progressService: ProgressService) {}
@@ -42,8 +43,7 @@ export class ProgressController {
     next: NextFunction,
   ) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const studentId = Number(req.params.studentId);
       const result = await this.progressService.getStudentProgress(
         studentId,
@@ -63,8 +63,13 @@ export class ProgressController {
     next: NextFunction,
   ) => {
     try {
+      const { page, limit } = paginationQuerySchema.parse(req.query);
       const id = Number(req.params.id);
-      const result = await this.progressService.getClassDisciplineProgress(id);
+      const result = await this.progressService.getClassDisciplineProgress(
+        id,
+        page,
+        limit,
+      );
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
