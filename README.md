@@ -36,8 +36,11 @@ Preencha o `.env` com os dados corretos (veja [Variáveis de ambiente](#variáve
 ## Configuração do banco
 
 ```bash
-# aplicar migrações e gerar o client do Prisma
+# aplicar migrações
 npx prisma migrate dev
+
+# gerar o client do Prisma (não roda mais automático a partir do Prisma 7)
+npx prisma generate
 ```
 
 ## Seed
