@@ -1,5 +1,6 @@
+import { NextFunction, Response } from "express";
+
 import { AuthRequest } from "../types/auth.types";
-import { Response, NextFunction } from "express";
 
 export function authMiddlewareRoles(...roles: string[]) {
   return (req: AuthRequest, res: Response, next: NextFunction) => {

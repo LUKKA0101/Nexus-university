@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import { TeacherService } from "./teacher.service";
-import { updateTeacherSchema } from "./teacher.validate";
+import { NextFunction, Request, Response } from "express";
+
 import { AuthRequest } from "../../types/auth.types";
 import { paginationQuerySchema } from "../../utils/pagination.validate";
+import { TeacherService } from "./teacher.service";
+import { updateTeacherSchema } from "./teacher.validate";
 
 export class TeacherController {
   constructor(private teacherService: TeacherService) {}

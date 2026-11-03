@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { LessonService } from "./lesson.service";
-import { LessonController } from "./lesson.controller";
+
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
+import { LessonController } from "./lesson.controller";
+import { LessonService } from "./lesson.service";
 
 const lessonRouter = Router();
 const lessonService = new LessonService();

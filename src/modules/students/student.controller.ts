@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { StudentService } from "./student.service";
 import { updateStudentSchema } from "./student.validate";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class StudentController {
   constructor(private studentService: StudentService) {}

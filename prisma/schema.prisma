@@ -3,7 +3,7 @@ generator client {
   output   = "../src/generated"
 }
 
-datasource db {S
+datasource db {
   provider = "postgresql"
 }
 

@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
+
 import prisma from "../../lib/prisma";
+import { generateAccessToken } from "../../utils/jwt";
 import { LoginDTO } from "./auth.validate";
 import { PasswordDTO } from "./auth.validate";
-import { generateAccessToken } from "../../utils/jwt";
 
 export class AuthService {
   async registerPassword(inviteToken: string, data: PasswordDTO) {

@@ -7,9 +7,9 @@ if (!SECRET_KEY) {
 }
 
 export const generateInviteToken = (userId: number): string => {
-  return jwt.sign({ userId }, SECRET_KEY!, { expiresIn: "48h" });
+  return jwt.sign({ userId }, SECRET_KEY, { expiresIn: "48h" });
 };
 
 export const generateAccessToken = (userId: number, role: string): string => {
-  return jwt.sign({ userId, role }, SECRET_KEY!, { expiresIn: "2h" });
+  return jwt.sign({ userId, role }, SECRET_KEY, { expiresIn: "2h" });
 };

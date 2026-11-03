@@ -1,6 +1,7 @@
-import { Response, NextFunction } from "express";
-import { AuthRequest } from "../types/auth.types";
+import { NextFunction, Response } from "express";
+
 import prisma from "../lib/prisma";
+import { AuthRequest } from "../types/auth.types";
 
 export const checkOwnership = (
   model: "teacher" | "student",

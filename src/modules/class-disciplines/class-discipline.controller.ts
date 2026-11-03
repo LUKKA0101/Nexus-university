@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { ClassDisciplineService } from "./class-discipline.service";
 import {
   createClassDisciplineSchema,
   updateClassDisciplineSchema,
 } from "./class-discipline.validate";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ClassDisciplineController {
   constructor(private classDisciplineService: ClassDisciplineService) {}

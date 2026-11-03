@@ -1,13 +1,13 @@
-import prisma from "../../lib/prisma";
 import { transporter } from "../../infra/email";
+import prisma from "../../lib/prisma";
+import { formatDatesInArray } from "../../utils/format";
+import { generateInviteToken } from "../../utils/jwt";
+import { buildPaginatedResponse } from "../../utils/paginate";
 import {
   RegisterDTO,
   StudentRegisterDTO,
   UpdateUserDTO,
 } from "./user.validate";
-import { generateInviteToken } from "../../utils/jwt";
-import { buildPaginatedResponse } from "../../utils/paginate";
-import { formatDatesInArray } from "../../utils/format";
 
 const userSelect = {
   id: true,
