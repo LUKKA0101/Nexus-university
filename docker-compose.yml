@@ -1,5 +1,5 @@
 services:
-  db:
+  database:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: nexus_university
@@ -7,8 +7,15 @@ services:
       POSTGRES_PASSWORD: Lh-19731973
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus_university"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-volumes:
-  postgres_data:
+  api:
+    build: .
+    depends_on:
+      database:
+        condition: service_healthy
