@@ -1,11 +1,12 @@
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { UserService } from "./user.service";
 import {
+  registerSchema,
   studentRegisterSchema,
   updateUserSchema,
-  registerSchema,
 } from "./user.validate";
-import { NextFunction, Request, Response } from "express";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class UserController {
   constructor(private userService: UserService) {}

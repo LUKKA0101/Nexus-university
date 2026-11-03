@@ -1,13 +1,14 @@
 import { Router } from "express";
-import { ProgressService } from "./progress.service";
-import { ProgressController } from "./progress.controller";
+
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
 import {
   checkOwnership,
   checkOwnershipProgress,
   checkOwnershipStudentFromBody,
 } from "../../middlewares/checkOwnership-auth.middleware";
+import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
+import { ProgressController } from "./progress.controller";
+import { ProgressService } from "./progress.service";
 
 const progressRouter = Router();
 const progressService = new ProgressService();

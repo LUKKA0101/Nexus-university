@@ -1,14 +1,10 @@
-import { NextFunction, Response, Request } from "express";
-import { Prisma } from "../generated/client";
+import { Request, Response } from "express";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { ZodError } from "zod";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
-function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+import { Prisma } from "../generated/client";
+
+function errorHandler(err: Error, req: Request, res: Response) {
   if (err instanceof ZodError) {
     return res.status(400).json({
       message: "Erro de validação",
@@ -29,7 +25,7 @@ function errorHandler(
 
       case "P2003":
         return res.status(404).json({
-          message: "Relacionamento inválido",
+          message: "Relacionamento invjálido",
         });
 
       default:

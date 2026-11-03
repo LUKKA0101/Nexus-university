@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { StudentService } from "./student.service";
-import { StudentController } from "./student.controller";
+
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
 import { checkOwnership } from "../../middlewares/checkOwnership-auth.middleware";
+import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
+import { StudentController } from "./student.controller";
+import { StudentService } from "./student.service";
 
 const studentRouter = Router();
 

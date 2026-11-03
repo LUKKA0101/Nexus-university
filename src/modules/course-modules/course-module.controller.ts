@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { CourseModuleService } from "./course-module.service";
 import {
   createCourseModuleSchema,
   updateCourseModuleSchema,
 } from "./course-module.validate";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class CourseModuleController {
   constructor(private courseModuleService: CourseModuleService) {}

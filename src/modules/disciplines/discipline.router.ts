@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { DisciplineService } from "./discipline.service";
-import { DisciplineController } from "./discipline.controller";
+
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
+import { DisciplineController } from "./discipline.controller";
+import { DisciplineService } from "./discipline.service";
 
 const disciplineRouter = Router();
 const disciplineService = new DisciplineService();

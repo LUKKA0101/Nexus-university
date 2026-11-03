@@ -1,6 +1,6 @@
 import prisma from "../../lib/prisma";
-import { UpdateTeacherDTO } from "./teacher.validate";
 import { buildPaginatedResponse } from "../../utils/paginate";
+import { UpdateTeacherDTO } from "./teacher.validate";
 
 const teacherSelect = {
   id: true,

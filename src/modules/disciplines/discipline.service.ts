@@ -1,9 +1,9 @@
 import prisma from "../../lib/prisma";
+import { buildPaginatedResponse } from "../../utils/paginate";
 import {
   CreateDisciplineDTO,
   UpdateDisciplineDTO,
 } from "./discipline.validate";
-import { buildPaginatedResponse } from "../../utils/paginate";
 
 const disciplineSelect = {
   id: true,

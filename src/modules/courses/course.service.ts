@@ -1,6 +1,5 @@
 import prisma from "../../lib/prisma";
 import { CreateCourseDTO, UpdateCourseDTO } from "./course.validate";
-import { buildPaginatedResponse } from "../../utils/paginate";
 
 const courseSelect = {
   id: true,

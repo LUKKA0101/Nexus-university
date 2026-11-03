@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
 import { LessonService } from "./lesson.service";
 import { createLessonSchema, updateLessonSchema } from "./lesson.validate";
 

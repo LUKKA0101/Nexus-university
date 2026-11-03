@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { TeacherService } from "./teacher.service";
-import { TeacherController } from "./teacher.controller";
+
 import { authMiddleware } from "../../middlewares/auth.middleware";
-import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
 import { checkOwnership } from "../../middlewares/checkOwnership-auth.middleware";
+import { authMiddlewareRoles } from "../../middlewares/role-auth.middleware";
+import { TeacherController } from "./teacher.controller";
+import { TeacherService } from "./teacher.service";
 
 const teacherRouter = Router();
 const teacherService = new TeacherService();

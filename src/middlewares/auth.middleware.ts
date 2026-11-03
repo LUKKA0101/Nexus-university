@@ -1,8 +1,9 @@
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import { Response, NextFunction } from "express";
+
 import { AuthRequest, payloadSchema } from "../types/auth.types";
 
-export async function authMiddleware(
+export function authMiddleware(
   req: AuthRequest,
   res: Response,
   next: NextFunction,

@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { ClassroomService } from "./classroom.service";
 import {
   createClassroomSchema,
   updateClassroomSchema,
 } from "./classroom.validate";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ClassroomController {
   constructor(private classroomService: ClassroomService) {}

@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { paginationQuerySchema } from "../../utils/pagination.validate";
 import { ProgressService } from "./progress.service";
 import { createProgressSchema } from "./progress.validate";
-import { paginationQuerySchema } from "../../utils/pagination.validate";
 
 export class ProgressController {
   constructor(private progressService: ProgressService) {}

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+
 import { AuthService } from "./auth.service";
-import { passwordSchema, loginSchema } from "./auth.validate";
+import { loginSchema, passwordSchema } from "./auth.validate";
 
 export class AuthController {
   constructor(private authService: AuthService) {}
