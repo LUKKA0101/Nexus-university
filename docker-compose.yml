@@ -2,9 +2,9 @@ services:
   database:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: nexus_university
-      POSTGRES_USER: lucas
-      POSTGRES_PASSWORD: Lh-19731973
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     healthcheck:
